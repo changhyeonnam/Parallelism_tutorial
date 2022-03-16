@@ -10,11 +10,22 @@ def run(rank,size):
     In order to obtain the sum of all tensors at all processes,
     we can use the dist.all_reduce(tensor, op, group) collective.
     """
-    group = dist.new_group([0,1])
-    tensor = torch.ones(1)
-    dist.all_reduce(tensor, op=dist.ReduceOp.SUM,group=group)
+    group = dist.new_group([0,1,2,3])
+    tensor = torch.tensor([rank+1])
+    dist.reduce(tensor,0, op=dist.ReduceOp.SUM,group=group)
     print(f'Rank {rank} has data {tensor[0]}\n')
 
+# def run(rank,size):
+#     """
+#     Simple collective communication.
+#     collectives allow for communication patterns across all process in a group.
+#     In order to obtain the sum of all tensors at all processes,
+#     we can use the dist.all_reduce(tensor, op, group) collective.
+#     """
+#     group = dist.new_group([0,1,2,3])
+#     tensor = torch.tensor([rank+1])
+#     dist.all_reduce(tensor, op=dist.ReduceOp.SUM,group=group)
+#     print(f'Rank {rank} has data {tensor[0]}\n')
 
 def init_process(rank,size,fn,backend='gloo'):
     '''
@@ -35,7 +46,7 @@ if __name__ == '__main__':
     2. initialize the process group
     3. execute given run function
     '''
-    size = 2
+    size = 4
     processes=[]
     mp.set_start_method('spawn')
     for rank in range(size):
